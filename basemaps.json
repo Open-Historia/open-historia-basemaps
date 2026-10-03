@@ -17,7 +17,11 @@
           "sha256": "42c40f2922bb7d03bf0a72cf34070cd51d3d3c5950bbb87dbf5e101802459822",
           "released": "2026-10-03"
         }
-      ]
+      ],
+      "archived": {
+        "reason": "Testing",
+        "date": "2026-10-03"
+      }
     }
   ]
 }
