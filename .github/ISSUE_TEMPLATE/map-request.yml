@@ -1,0 +1,105 @@
+name: Submit a map or a map update
+description: Ask the Open Historia team to add a new detailed map, or a new version of an existing one.
+title: "[Submit map] "
+labels: ["map submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for making a map! A maintainer checks every map before players can download it.
+        Your map file needs to be online somewhere we can download it from (a release on your own GitHub works best). After it's approved, we copy it here and you can delete your copy.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Is this a new map or an update?
+      options:
+        - New map
+        - Update to a map already on the list
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Map name
+      description: The name players will see.
+      placeholder: Game of Thrones world map
+    validations:
+      required: true
+  - type: input
+    id: map-id
+    attributes:
+      label: Map ID (updates only)
+      description: For an update, the existing ID from basemaps.json. For a new map, suggest one if you like (lower-case letters, digits and dashes). We'll confirm it.
+      placeholder: got-world
+  - type: input
+    id: download
+    attributes:
+      label: Download link to the .pmtiles file
+      description: A direct link to the file. It must be a raster PMTiles file of 500 MB or less.
+      placeholder: https://github.com/you/your-repo/releases/download/v1/my-map.pmtiles
+    validations:
+      required: true
+  - type: input
+    id: size
+    attributes:
+      label: File size
+      placeholder: 463 MB
+    validations:
+      required: true
+  - type: input
+    id: sha256
+    attributes:
+      label: SHA-256 checksum (optional)
+      description: Helps us check that we got the exact file. On Windows, run `certutil -hashfile my-map.pmtiles SHA256`. On Mac or Linux, run `shasum -a 256 my-map.pmtiles`.
+  - type: textarea
+    id: description
+    attributes:
+      label: What does the map show?
+      description: The area covered, the zoom levels and anything special (for example, extra detail around cities).
+    validations:
+      required: true
+  - type: textarea
+    id: changes
+    attributes:
+      label: What changed? (updates only)
+      description: What's different from the current version, so we can decide whether it's worth players downloading again.
+  - type: textarea
+    id: preview
+    attributes:
+      label: Screenshots
+      description: Drag in one or two screenshots, one zoomed out and one zoomed in close.
+    validations:
+      required: true
+  - type: textarea
+    id: credits
+    attributes:
+      label: Who made it, and what is it based on?
+      description: Your name, plus every source the map uses (data, artwork, other maps), with links.
+    validations:
+      required: true
+  - type: input
+    id: licence
+    attributes:
+      label: Licence
+      description: The licence the map is released under, for example CC BY-SA 4.0. If it's built on someone else's work, it must follow their licence too.
+      placeholder: CC BY-NC-SA 3.0
+    validations:
+      required: true
+  - type: input
+    id: scenarios
+    attributes:
+      label: Scenarios that use it (optional)
+      description: Links to any scenarios built on this map.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you submit
+      options:
+        - label: I made this map, or I have the right to share it under the licence above.
+          required: true
+        - label: Any scenario using this map also includes a basic (painted) map, for players who don't download it.
+          required: true
+        - label: The file is 500 MB or less.
+          required: true
+        - label: The map contains no offensive content.
+          required: true

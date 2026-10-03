@@ -18,7 +18,7 @@ A scenario names a map by its id and the lowest version it needs. When a player 
 
 ## Adding a map or a new version (maintainers)
 
-1. Review the submission (an issue titled `[Submit map] …`). Check what it shows, who made it, and its licence.
+1. Review the submission: an issue titled `[Submit map] …`, made with the **Submit a map or a map update** form (the game's ⤴ button opens it with the name, size and checksum filled in). Check what it shows, who made it, and its licence.
 2. Make a release:
    - **Tag:** `<map-id>-v<version>`, for example `got-world-v2`. A new map picks its id here, in lower-case letters, digits and dashes. The id never changes after that.
    - **Title:** the map's name, for example `Game of Thrones world map (v2)`.
