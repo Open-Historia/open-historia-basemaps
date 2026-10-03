@@ -1,4 +1,23 @@
 {
   "format": 1,
-  "basemaps": []
+  "basemaps": [
+    {
+      "id": "got-world",
+      "name": "Game of Thrones world map",
+      "author": "SeventhDread",
+      "owners": [
+        "SeventhDread"
+      ],
+      "license": "CC BY-NC-SA 3.0",
+      "versions": [
+        {
+          "version": 1,
+          "url": "https://github.com/Open-Historia/open-historia-basemaps/releases/download/got-world-v1/got-world-v1.pmtiles",
+          "bytes": 463431905,
+          "sha256": "42c40f2922bb7d03bf0a72cf34070cd51d3d3c5950bbb87dbf5e101802459822",
+          "released": "2026-10-03"
+        }
+      ]
+    }
+  ]
 }

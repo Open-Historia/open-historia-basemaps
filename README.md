@@ -101,5 +101,7 @@ Each map has its own licence, which applies to that map's release files. It is n
 The maps players are offered right now. This table is rewritten automatically from [`basemaps.json`](basemaps.json) whenever a map is added, and each version has its own page under [Releases](https://github.com/Open-Historia/open-historia-basemaps/releases) with its description, credits and licence.
 
 <!-- maps:start -->
-_No maps yet._
+| ID | Name | Latest | Size | Owners | Licence |
+|---|---|---|---|---|---|
+| `got-world` | Game of Thrones world map | [v1](https://github.com/Open-Historia/open-historia-basemaps/releases/tag/got-world-v1) | 442 MB | @SeventhDread | CC BY-NC-SA 3.0 |
 <!-- maps:end -->
