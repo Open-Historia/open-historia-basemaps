@@ -1,0 +1,44 @@
+# When someone opens or edits a "[Submit map]" issue: downloads the map from
+# the link they gave, checks it the way the game does, and posts the result on
+# the issue (one comment, updated on every edit) with a "checks passed" or
+# "needs changes" label.
+name: Check a map submission
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: map-check-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    if: startsWith(github.event.issue.title, '[Submit map]') && github.event.issue.state == 'open'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ISSUE: ${{ github.event.issue.number }}
+      ISSUE_BODY: ${{ github.event.issue.body }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - name: Check the submission and its map
+        id: check
+        run: |
+          printf '%s' "$ISSUE_BODY" > "$RUNNER_TEMP/body.md"
+          node scripts/check-submission.mjs --body "$RUNNER_TEMP/body.md" --dir "$RUNNER_TEMP/work" --comment "$RUNNER_TEMP/comment.md"
+
+      - name: Post the result on the issue
+        if: steps.check.outputs.status
+        run: bash scripts/post-check.sh "$ISSUE" "$RUNNER_TEMP/comment.md" "${{ steps.check.outputs.status }}"

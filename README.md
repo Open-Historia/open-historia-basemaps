@@ -5,6 +5,7 @@ The official detailed maps for Open Historia. The game downloads detailed (tiled
 - `basemaps.json` lists every map: a fixed **id**, and for each **version** its release link, size and SHA-256 checksum.
 - Each version's `.pmtiles` file (and an optional preview picture) is attached to its own release, tagged `<id>-v<version>`, for example `got-world-v1`.
 - The map files themselves live only in releases, never in the repository.
+- Designers submit maps through an issue form, a bot checks them, and once a maintainer approves one it is published automatically.
 
 ## Maps
 
@@ -42,13 +43,15 @@ Until your map is on this list, only you can see it. Anyone else playing your sc
 
 ### Submitting a map
 
-1. Put the `.pmtiles` file online where the team can download it. A release on your own GitHub repository works best. You can delete it once your map is approved.
+1. Put the `.pmtiles` file online as a **direct download**. A release on your own GitHub repository works best. Dropbox or any direct web link also works, but Google Drive often doesn't for big files. You can delete your copy once your map is published.
 2. In the basemap picker, press **⤴** on your map under My Basemaps. This opens the **Submit a map or a map update** form with the map's name, size and checksum already filled in. You can also open the form yourself from this repository's Issues tab.
-3. Fill in the rest: the download link, what the map shows, screenshots (one zoomed out, one close up), who made it and what it is based on, and its licence. Then submit.
+3. Fill in the rest: the download link, the map ID you'd like (lower-case letters, digits and dashes, like `got-world`; it can never change later), what the map shows, screenshots (one zoomed out, one close up), who made it and what it is based on, and its licence. Tick the boxes and submit.
 
 ### What happens next
 
-A maintainer reviews your submission. They check what the map shows, that the file is what you described, and that its licence allows it. If it's approved, they publish it here as an official release. This repository's checks then confirm the file works in the game and propose adding it to the list, and a maintainer approves that. Players are offered the map only after that last step. The team reviews in their spare time, so this can take a while. If something needs changing, they'll reply on your issue.
+1. **Automatic checks, within minutes.** A bot downloads your file and checks it the way the game will: that it's a real map of picture tiles, 500 MB or less, and that it matches the checksum. It also checks that every part of the form is filled in. It posts the result on your issue: ✅ **passes the checks**, or ❌ **needs changes** with exactly what to fix. To fix something, edit your issue, and the checks run again.
+2. **A maintainer reviews it.** A person looks at the screenshots, the credits and the licence. The team reviews in their spare time, so this can take a while. If something needs changing, they'll reply on your issue.
+3. **Approved, then published automatically.** When a maintainer approves it, the bot checks the file once more (it must still be the exact file that passed), publishes it here as an official release, adds it to the list, and closes your issue with a link. Players are offered your map from that moment.
 
 ### Updating a map
 
@@ -57,20 +60,26 @@ Submit the new file with the same form, choosing **Update to a map already on th
 - Players who have version 1 keep it. The game offers the update with its size, and they choose whether to download it. If they do, it replaces their old copy, so they never keep two.
 - Scenarios name the lowest version they need, so scenarios made on version 1 keep working on version 2, and players with version 1 can still play a scenario made on version 2.
 
-## For maintainers: adding a map or a new version
+## For maintainers
 
-1. Review the submission: an issue titled `[Submit map] …`, made with the **Submit a map or a map update** form (the game's ⤴ button opens it with the name, size and checksum filled in). Check what it shows, who made it, and its licence.
-2. Make a release:
-   - **Tag:** `<map-id>-v<version>`, for example `got-world-v2`. A new map picks its id here, in lower-case letters, digits and dashes. The id never changes after that.
-   - **Title:** the map's name, for example `Game of Thrones world map (v2)`.
-   - **File:** attach the map as `<tag>.pmtiles`, for example `got-world-v2.pmtiles`. A preview picture can go beside it as `<tag>-preview.png`.
-   - **Notes:** a short description, the credits, and a `## Licence` heading with the licence on the line below it. The licence is required for a new map.
-3. Publish it. The **Add a released map to the list** action checks the file the way the game will (format, raster tiles, size within 500 MB) and works out its size and SHA-256. It then opens a pull request that adds the version to `basemaps.json`. If the check fails, the action run fails with the reason, and no pull request is opened.
-4. Review and merge that pull request. Players are offered the map once it is merged, and not before.
+### Approving a submission
 
-To retry a release, for example after re-attaching a file with the right name, open Actions → Add a released map to the list → Run workflow, and give it the tag.
+1. Wait for the bot's ✅ **passes the checks** comment on the `[Submit map]` issue. It shows what the map will become (for example `got-world-v1`), its size, zooms, area and checksum.
+2. Review what the bot can't check: the screenshots (is it suitable, is it what it says), the credits, and whether the licence really allows it.
+3. Add the **approved** label. The **Publish an approved map** action then does everything else: checks the file again, refuses if it changed since the check, makes the release `<id>-v<version>`, writes the release notes from the form, adds it to `basemaps.json` on `main`, and closes the issue. If anything fails, it says why on the issue and removes the label.
 
-**One-time setup:** the action opens pull requests with the repository's own token. In Settings → Actions → General → Workflow permissions, tick **Allow GitHub Actions to create and approve pull requests**.
+Only people with write, maintain or admin access can approve. The label from anyone else is removed and ignored.
+
+### Publishing a map by hand
+
+You can still make a release yourself: tag `<map-id>-v<version>`, the map's name as the title, the file attached as `<tag>.pmtiles`, and a `## Licence` heading in the notes. The **Add a released map to the list** action checks it and opens a pull request adding it to `basemaps.json`, which you then merge. A release that is already on the list (like every approved submission) is skipped. To retry, open Actions → Add a released map to the list → Run workflow, and give it the tag.
+
+### Repository settings (for an admin, once)
+
+- **Settings → Actions → General → Workflow permissions:** each action asks only for the permissions it needs. Nothing has to change unless the organisation limits the token. If a run fails with "Resource not accessible by integration", choose **Read and write permissions** here.
+- **Allow GitHub Actions to create and approve pull requests** (same page): only needed for **Publishing a map by hand**, which opens a pull request. Approving submissions doesn't need it.
+- **Branch protection or rulesets on `main`:** none at the moment. If you add a rule that requires pull requests, let GitHub Actions bypass it. Otherwise an approved map is released but can't be added to the list.
+- **Issues** must stay enabled, since submissions are issues. The bot creates its labels (`checks passed`, `needs changes`, `approved`, `map submission`) itself.
 
 Never change or delete the file of a version that is already listed: scenarios and players' copies trust its checksum. If a map is corrected, list it as a new version.
 

@@ -1,0 +1,120 @@
+# When a maintainer adds the "approved" label to a "[Submit map]" issue: checks
+# the map again, makes sure it is the file that was checked, publishes it as an
+# official release (<id>-v<version>), adds it to basemaps.json on main, and
+# closes the issue. Players are offered the map from then on. The label from
+# anyone without write access to this repository is removed and ignored.
+name: Publish an approved map
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: basemaps-list
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event.label.name == 'approved' && startsWith(github.event.issue.title, '[Submit map]')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ISSUE: ${{ github.event.issue.number }}
+      ISSUE_BODY: ${{ github.event.issue.body }}
+      APPROVER: ${{ github.event.sender.login }}
+      AUTHOR: ${{ github.event.issue.user.login }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Only maintainers can approve
+        run: |
+          permission=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$APPROVER/permission" --jq .permission 2>/dev/null || echo none)
+          case "$permission" in
+            admin|maintain|write) echo "Approved by $APPROVER ($permission)." ;;
+            *)
+              gh issue edit "$ISSUE" --remove-label approved
+              gh issue comment "$ISSUE" --body "Only maintainers of this repository can approve a map, so the **approved** label was removed."
+              exit 1 ;;
+          esac
+
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - name: Find the file that was approved
+        id: approved
+        run: |
+          sha=$(gh api "repos/$GITHUB_REPOSITORY/issues/$ISSUE/comments" --paginate \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- map-check"))) | .body' \
+            | head -n 1 | sed -n 's/^<!-- map-check sha256=\([a-f0-9]*\) -->.*/\1/p')
+          echo "sha256=$sha" >> "$GITHUB_OUTPUT"
+
+      - name: Check the map again
+        id: check
+        run: |
+          printf '%s' "$ISSUE_BODY" > "$RUNNER_TEMP/body.md"
+          node scripts/check-submission.mjs --body "$RUNNER_TEMP/body.md" --dir "$RUNNER_TEMP/work" \
+            --comment "$RUNNER_TEMP/comment.md" --result "$RUNNER_TEMP/result.json"
+
+      - name: Get it ready
+        id: ready
+        run: >
+          node scripts/publish-submission.mjs
+          --body "$RUNNER_TEMP/body.md"
+          --result "$RUNNER_TEMP/result.json"
+          --approved-sha256 "${{ steps.approved.outputs.sha256 }}"
+          --author "$AUTHOR"
+          --list basemaps.json
+          --notes "$RUNNER_TEMP/notes.md"
+
+      - name: Publish the release
+        env:
+          TAG: ${{ steps.ready.outputs.tag }}
+          NAME: ${{ steps.ready.outputs.name }}
+        run: |
+          mv "$RUNNER_TEMP/work/map.pmtiles" "$RUNNER_TEMP/$TAG.pmtiles"
+          gh release create "$TAG" "$RUNNER_TEMP/$TAG.pmtiles" \
+            --target main --title "$NAME (v${TAG##*-v})" --notes-file "$RUNNER_TEMP/notes.md"
+
+      - name: Add it to the list
+        env:
+          TAG: ${{ steps.ready.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add basemaps.json
+          git commit -m "Add $TAG to the list (#$ISSUE)"
+          git push origin HEAD:main
+
+      - name: Tell the submitter and close the issue
+        env:
+          TAG: ${{ steps.ready.outputs.tag }}
+        run: |
+          gh issue comment "$ISSUE" --body "✅ Published as [$TAG](https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG) and added to the official list. Players are now offered it. Thank you!"
+          gh issue close "$ISSUE" --reason completed
+
+      - name: Say what went wrong
+        if: failure() && steps.check.outcome != 'skipped'
+        env:
+          REASON: ${{ steps.ready.outputs.reason }}
+          TAG: ${{ steps.ready.outputs.tag }}
+          RELEASED: ${{ steps.ready.outcome == 'success' }}
+        run: |
+          if [ -f "$RUNNER_TEMP/comment.md" ]; then
+            bash scripts/post-check.sh "$ISSUE" "$RUNNER_TEMP/comment.md" "${{ steps.check.outputs.status || 'failed' }}" || true
+          fi
+          gh issue edit "$ISSUE" --remove-label approved || true
+          message="❌ The map couldn't be published. ${REASON:-See [the run]($RUN_URL) for what went wrong.}"
+          if [ "$RELEASED" = "true" ] && gh release view "$TAG" > /dev/null 2>&1; then
+            message="$message The release $TAG was made, but it isn't on the list yet: a maintainer can run **Add a released map to the list** with the tag $TAG to finish."
+          fi
+          gh issue comment "$ISSUE" --body "$message The **approved** label was removed; add it again once this is fixed."
