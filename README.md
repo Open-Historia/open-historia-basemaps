@@ -9,9 +9,7 @@ The official detailed maps for Open Historia. The game downloads detailed (tiled
 
 ## Maps
 
-| Id | Name | Licence |
-|---|---|---|
-| `got-world` | Game of Thrones world map (added by the action once its release is published and the pull request merged) | CC BY-NC-SA 3.0, in the [got-world-v1 release notes](https://github.com/Open-Historia/open-historia-basemaps/releases/tag/got-world-v1) |
+Every published map is in [`basemaps.json`](basemaps.json), and each version has its own page under [Releases](https://github.com/Open-Historia/open-historia-basemaps/releases), with its description, credits and licence. Both are updated automatically when a map is approved, so there is no list to keep up to date here.
 
 ## For scenario designers
 
