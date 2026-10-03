@@ -49,9 +49,9 @@ Until your map is on this list, only you can see it. Anyone else playing your sc
    - go to this repository's **Issues → New issue** and choose **Submit a map or a map update**.
 3. Fill in the rest: the download link, the map ID you'd like (lower-case letters, digits and dashes, like `got-world`; it can never change later), what the map shows, screenshots (one zoomed out, one close up), who made it and what it is based on, and its licence. Tick the boxes and submit.
 
-> **Always use the form.** A blank issue isn't checked or published: the bot reads the form's questions to find your map.
-> **Keep `[Submit map]` at the start of the title.** Add your map's name after it (the ⤴ button does this for you), but don't delete it. It's how maintainers and the bot spot submissions.
-> Don't delete or rename the form's headings either. Just fill in the answers under them.
+> **Important:**
+> - **Always use the form.** Blank issues are switched off in this repository, so the form is the only way in. The bot reads the form's questions to find your answers, so don't delete or rename its headings. Just fill in the answers under them.
+> - **Keep `[Submit map]` at the start of the title**, and add your map's name after it (the ⤴ button does this for you). Maintainers use it to spot submissions, and the bot uses it alongside the form's questions.
 
 ### Map IDs and who owns a map
 

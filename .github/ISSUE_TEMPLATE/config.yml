@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Open Historia game, scenarios and everything else
+    url: https://github.com/Open-Historia/open-historia/issues
+    about: Bugs and ideas for the game itself go to the main repository.
