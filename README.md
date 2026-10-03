@@ -19,20 +19,22 @@ A scenario names a map by its id and the lowest version it needs. When a player 
 ## Adding a map or a new version (maintainers)
 
 1. Review the submission (an issue titled `[Submit map] …`). Check what it shows, who made it, and its licence.
-2. In the game's repository, run:
+2. Make a release:
+   - **Tag:** `<map-id>-v<version>`, for example `got-world-v2`. A new map picks its id here, in lower-case letters, digits and dashes. The id never changes after that.
+   - **Title:** the map's name, for example `Game of Thrones world map (v2)`.
+   - **File:** attach the map as `<tag>.pmtiles`, for example `got-world-v2.pmtiles`. A preview picture can go beside it as `<tag>-preview.png`.
+   - **Notes:** a short description, the credits, and a `## Licence` heading with the licence on the line below it. The licence is required for a new map.
+3. Publish it. The **Add a released map to the list** action checks the file the way the game will (format, raster tiles, size within 500 MB) and works out its size and SHA-256. It then opens a pull request that adds the version to `basemaps.json`. If the check fails, the action run fails with the reason, and no pull request is opened.
+4. Review and merge that pull request. Players are offered the map once it is merged, and not before.
 
-   ```
-   node scripts/official-basemap-entry.mjs <file.pmtiles> --id <map-id> --version <n> --list <path to this repo>/basemaps.json --name "…" --author "…" --license "…"
-   ```
+To retry a release, for example after re-attaching a file with the right name, open Actions → Add a released map to the list → Run workflow, and give it the tag.
 
-   It checks the file the way the game will, then writes the entry.
-3. Make a release tagged exactly as the script says (`<id>-v<n>`), and attach the file under exactly the same name. Put the map's licence and credits in the release notes.
-4. Commit `basemaps.json`.
+**One-time setup:** the action opens pull requests with the repository's own token. In Settings → Actions → General → Workflow permissions, tick **Allow GitHub Actions to create and approve pull requests**.
 
 Never change or delete the file of a version that is already listed: scenarios and players' copies trust its checksum. If a map is corrected, list it as a new version.
 
 ## Licences
 
-This repository's own files (this README, `basemaps.json`) are licensed under the GNU Affero General Public License v3.0 or later, the same as Open Historia; see [LICENSE](LICENSE).
+This repository's own files (this README, `basemaps.json`, the check script and the action) are licensed under the GNU Affero General Public License v3.0 or later, the same as Open Historia; see [LICENSE](LICENSE).
 
 Each map has its own licence, which applies to that map's release files. It is named in `basemaps.json`, and given in full with the map's credits in the notes of its release. The Game of Thrones world map (`got-world`) is CC BY-NC-SA 3.0. It is drawn from GOT-Inspired-Map by cadaei, theMountainGoat and Tear, and A Song of Ice and Fire is © George R. R. Martin. It is an unofficial, non-commercial fan map.

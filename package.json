@@ -1,0 +1,13 @@
+{
+  "name": "open-historia-basemaps",
+  "private": true,
+  "type": "module",
+  "description": "Checks released maps and adds them to basemaps.json",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "add-release": "node scripts/add-release.mjs"
+  },
+  "dependencies": {
+    "pmtiles": "4.4.0"
+  }
+}
