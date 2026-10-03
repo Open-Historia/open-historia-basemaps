@@ -2,7 +2,7 @@
 // map-request.yml) and deciding what it would become: which map id, which
 // version, and what is wrong with it, if anything.
 
-import { ID_PATTERN, nextVersion, plain } from "./maps.mjs";
+import { ID_PATTERN, mapOwners, nextVersion, plain } from "./maps.mjs";
 
 // GitHub turns each form field into "### <label>" followed by the answer, and
 // an empty optional answer into "_No response_".
@@ -55,9 +55,13 @@ export const slugify = (text) => String(text || "")
   .replace(/-+$/g, "");
 
 // What the submission would become, and every problem with its answers (not
-// the file: that is checked once it is downloaded).
-export const planSubmission = (form, list) => {
+// the file: that is checked once it is downloaded). `author` is the GitHub
+// login of whoever opened the issue: an update must come from one of the map's
+// owners. That one problem is kept apart (`ownerProblem`), because a
+// maintainer may still approve it on the submitter's behalf.
+export const planSubmission = (form, list, author = "") => {
   const problems = [];
+  let ownerProblem = "";
   const isUpdate = /^update/i.test(form.kind);
   const asked = plain(form.mapId).toLowerCase();
   let id = "";
@@ -65,6 +69,13 @@ export const planSubmission = (form, list) => {
     id = asked;
     if (!id) problems.push("An update needs the map ID of the map it updates.");
     else if (!list.basemaps.some((entry) => entry.id === id)) problems.push(`There is no map "${id}" on the list to update. Check the ID, or submit it as a new map.`);
+    else {
+      const owners = mapOwners(list.basemaps.find((entry) => entry.id === id));
+      if (!owners.some((login) => login.toLowerCase() === String(author).toLowerCase())) {
+        const named = owners.length ? owners.map((login) => `@${login}`).join(" or ") : "its owners";
+        ownerProblem = `\`${id}\` belongs to ${named}, so only they can publish new versions of it. Ask them to submit the update, or submit yours as a new map with its own ID.`;
+      }
+    }
   } else {
     id = asked || slugify(form.name);
     if (!ID_PATTERN.test(id)) problems.push(`"${id || form.name}" can't be a map ID: use lower-case letters, digits and dashes.`);
@@ -80,13 +91,15 @@ export const planSubmission = (form, list) => {
   if (form.ticked < CHECKBOX_COUNT) problems.push("Tick all the boxes under \"Before you submit\".");
   const sha256 = plain(form.sha256).toLowerCase();
   if (sha256 && !/^[a-f0-9]{64}$/.test(sha256)) problems.push("The SHA-256 checksum should be 64 letters and digits (or leave it empty).");
-  const version = id && ID_PATTERN.test(id) ? nextVersion(list, id) : 0;
-  return { isUpdate, id, version, tag: version ? `${id}-v${version}` : "", sha256, problems };
+  const taken = !isUpdate && list.basemaps.some((entry) => entry.id === id);
+  const version = id && ID_PATTERN.test(id) && !taken ? nextVersion(list, id) : 0;
+  return { isUpdate, id, version, tag: version ? `${id}-v${version}` : "", sha256, problems, ownerProblem };
 };
 
-export const releaseNotes = ({ form, id, version, tag, size, sha256 }) => [
+export const releaseNotes = ({ form, id, version, tag, size, sha256, onBehalf = "" }) => [
   `**${plain(form.name)}, version ${version}** (map id \`${id}\`)`,
   "",
+  ...(onBehalf ? [onBehalf, ""] : []),
   form.description.trim(),
   "",
   ...(form.changes.trim() ? ["## What changed", "", form.changes.trim(), ""] : []),

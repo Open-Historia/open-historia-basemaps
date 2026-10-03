@@ -4,7 +4,7 @@
 // opened or edited, and again just before an approved map is published.
 //
 //   node scripts/check-submission.mjs --body issue-body.md --dir <work dir>
-//     [--list basemaps.json] [--comment comment.md] [--result result.json]
+//     --author <issue author> [--list basemaps.json] [--comment comment.md] [--result result.json]
 //     [--local-file map.pmtiles]   (testing only: use this file instead of downloading)
 //
 // Writes the comment to post on the issue (one comment, updated on every run)
@@ -24,7 +24,7 @@ const option = (name) => {
 
 const form = parseSubmission(fs.readFileSync(option("body"), "utf8"));
 const list = readList(option("list") || "basemaps.json");
-const plan = planSubmission(form, list);
+const plan = planSubmission(form, list, option("author") || "");
 const dir = option("dir") || ".";
 fs.mkdirSync(dir, { recursive: true });
 const file = path.join(dir, "map.pmtiles");
@@ -53,7 +53,10 @@ if (/^https:\/\//i.test(form.download.trim())) {
   }
 }
 
-const passed = problems.length === 0;
+// Everything but ownership must pass; an update from someone who isn't an
+// owner fails too, but a maintainer may approve it anyway.
+const passed = problems.length === 0 && !plan.ownerProblem;
+const onlyOwnership = problems.length === 0 && Boolean(plan.ownerProblem);
 const row = (label, value) => `| ${label} | ${value} |`;
 const comment = [
   `<!-- map-check sha256=${sha256 || "none"} -->`,
@@ -65,10 +68,12 @@ const comment = [
     ? "A maintainer will now look at the map, its credits and its licence. If it's approved, it is published automatically and players are offered it."
     : "Fix the points below by editing this issue (⋯ → Edit). The checks run again on every edit.",
   "",
-  ...(problems.length ? [...problems.map((problem) => `- ${problem}`), ""] : []),
+  ...(problems.length || plan.ownerProblem
+    ? [...problems.map((problem) => `- ${problem}`), ...(plan.ownerProblem ? [`- ${plan.ownerProblem}`] : []), ""]
+    : []),
   "| | |",
   "|---|---|",
-  row("Becomes", plan.tag ? `\`${plan.tag}\` (${plan.isUpdate ? "an update" : "a new map"})` : "—"),
+  row("Becomes", plan.tag ? `\`${plan.tag}\` (${plan.isUpdate ? `version ${plan.version} of \`${plan.id}\`` : `a new map with the ID \`${plan.id}\`, which never changes`})` : "—"),
   row("Name", plain(form.name) || "—"),
   row("File", info ? `${info.tileType} tiles, ${megabytes(size)} MB (${size} bytes)` : "—"),
   row("Zooms", info ? `${info.minzoom}–${info.maxzoom}` : "—"),
@@ -77,11 +82,12 @@ const comment = [
   row("Licence", plain(form.licence) || "—"),
   "",
   passed ? "_Maintainers: add the **approved** label to publish it. Only people with write access to this repository can approve._" : "",
+  onlyOwnership ? "_Maintainers: everything else passes. Adding the **approved** label publishes it anyway, on the submitter's behalf, and the release notes say who approved it._" : "",
 ].join("\n");
 
 if (option("comment")) fs.writeFileSync(option("comment"), comment);
 if (option("result")) {
-  fs.writeFileSync(option("result"), JSON.stringify({ passed, problems, ...plan, size, sha256, info }, null, 2));
+  fs.writeFileSync(option("result"), JSON.stringify({ ...plan, passed, onlyOwnership, problems, size, sha256, info }, null, 2));
 }
 console.log(comment);
 setOutput("status", passed ? "passed" : "failed");

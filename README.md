@@ -47,6 +47,12 @@ Until your map is on this list, only you can see it. Anyone else playing your sc
 2. In the basemap picker, press **⤴** on your map under My Basemaps. This opens the **Submit a map or a map update** form with the map's name, size and checksum already filled in. You can also open the form yourself from this repository's Issues tab.
 3. Fill in the rest: the download link, the map ID you'd like (lower-case letters, digits and dashes, like `got-world`; it can never change later), what the map shows, screenshots (one zoomed out, one close up), who made it and what it is based on, and its licence. Tick the boxes and submit.
 
+### Map IDs and who owns a map
+
+- **The map ID** is the short name scenarios use to find your map, like `got-world`. You suggest it in the form; if you leave it empty, the bot makes one from the map's name. The bot checks it is valid (lower-case letters, digits and dashes) and that no other map already has it. Its comment shows the ID the map will get, so the maintainer sees it before approving. Once the map is published, the ID never changes.
+- **You own the map you submit first.** Only a map's owners can publish new versions of it. If you submit an update to someone else's map, the bot says so: ask the owner to submit it, or submit yours as a new map with its own ID. A maintainer can still approve it in a special case, and the release notes then say who approved it, and for whom.
+- **Sharing ownership:** a map's owners are listed in `basemaps.json` under `owners`. To add a co-owner, open a pull request adding their GitHub name there (or ask a maintainer to).
+
 ### What happens next
 
 1. **Automatic checks, within minutes.** A bot downloads your file and checks it the way the game will: that it's a real map of picture tiles, 500 MB or less, and that it matches the checksum. It also checks that every part of the form is filled in. It posts the result on your issue: ✅ **passes the checks**, or ❌ **needs changes** with exactly what to fix. To fix something, edit your issue, and the checks run again.
@@ -64,7 +70,7 @@ Submit the new file with the same form, choosing **Update to a map already on th
 
 ### Approving a submission
 
-1. Wait for the bot's ✅ **passes the checks** comment on the `[Submit map]` issue. It shows what the map will become (for example `got-world-v1`), its size, zooms, area and checksum.
+1. Wait for the bot's ✅ **passes the checks** comment on the `[Submit map]` issue. It shows what the map will become (for example `got-world-v1`, and for a new map the ID it keeps for good), its size, zooms, area and checksum. An update from someone who isn't one of the map's owners shows ❌ for that reason alone; approving it anyway publishes it on their behalf, and the release notes record who approved it.
 2. Review what the bot can't check: the screenshots (is it suitable, is it what it says), the credits, and whether the licence really allows it.
 3. Add the **approved** label. The **Publish an approved map** action then does everything else: checks the file again, refuses if it changed since the check, makes the release `<id>-v<version>`, writes the release notes from the form, adds it to `basemaps.json` on `main`, and closes the issue. If anything fails, it says why on the issue and removes the label.
 

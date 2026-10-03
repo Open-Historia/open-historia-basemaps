@@ -6,6 +6,7 @@
 //
 //   node scripts/publish-submission.mjs --body issue-body.md --result result.json
 //     --approved-sha256 <sha from the check comment> --author <issue author>
+//     --approver <who added the approved label>
 //     [--list basemaps.json] [--notes notes.md]
 //
 // Prints tag=<id>-v<version> and name=<map name>.
@@ -31,7 +32,15 @@ const result = JSON.parse(fs.readFileSync(option("result"), "utf8"));
 const approved = String(option("approved-sha256") || "");
 const listPath = option("list") || "basemaps.json";
 
-if (!result.passed) fail(`The submission no longer passes its checks: ${result.problems.join(" ")}`);
+// An update from someone who isn't one of the map's owners passes only
+// because a maintainer approved it (the workflow honours the label from
+// maintainers alone), and the release notes say so.
+if (!result.passed && !result.onlyOwnership) fail(`The submission no longer passes its checks: ${result.problems.join(" ")}`);
+const author = plain(option("author") || "");
+const approver = plain(option("approver") || "");
+const onBehalf = result.onlyOwnership
+  ? `_Approved by @${approver} on behalf of @${author}, who is not an owner of this map._`
+  : "";
 if (!/^[a-f0-9]{64}$/.test(approved)) fail("There is no passed check on this issue to approve. Edit the issue to run the checks, then approve again.");
 if (approved !== result.sha256) {
   fail("The file at the download link has changed since it was checked, so it isn't the file that was approved. The checks have run again; review the new result, then approve again.");
@@ -46,7 +55,7 @@ try {
     size: result.size,
     sha256: result.sha256,
     name: plain(form.name).slice(0, 80),
-    author: plain(option("author") || "").slice(0, 80),
+    author: author.slice(0, 80),
     license: plain(form.licence).slice(0, 200),
   });
   if (status !== "added") fail(`${result.tag} is already on the list.`);
@@ -54,6 +63,6 @@ try {
   fail(error.message);
 }
 writeList(listPath, list);
-if (option("notes")) fs.writeFileSync(option("notes"), releaseNotes({ form, ...result }));
+if (option("notes")) fs.writeFileSync(option("notes"), releaseNotes({ form, ...result, onBehalf }));
 setOutput("tag", result.tag);
 setOutput("name", plain(form.name).slice(0, 80).replace(/[\r\n]/g, " "));

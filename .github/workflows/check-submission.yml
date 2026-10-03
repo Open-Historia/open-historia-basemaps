@@ -24,6 +24,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ISSUE: ${{ github.event.issue.number }}
       ISSUE_BODY: ${{ github.event.issue.body }}
+      AUTHOR: ${{ github.event.issue.user.login }}
     steps:
       - uses: actions/checkout@v5
 
@@ -37,7 +38,7 @@ jobs:
         id: check
         run: |
           printf '%s' "$ISSUE_BODY" > "$RUNNER_TEMP/body.md"
-          node scripts/check-submission.mjs --body "$RUNNER_TEMP/body.md" --dir "$RUNNER_TEMP/work" --comment "$RUNNER_TEMP/comment.md"
+          node scripts/check-submission.mjs --body "$RUNNER_TEMP/body.md" --dir "$RUNNER_TEMP/work" --author "$AUTHOR" --comment "$RUNNER_TEMP/comment.md"
 
       - name: Post the result on the issue
         if: steps.check.outputs.status

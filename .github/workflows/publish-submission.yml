@@ -62,7 +62,7 @@ jobs:
         id: check
         run: |
           printf '%s' "$ISSUE_BODY" > "$RUNNER_TEMP/body.md"
-          node scripts/check-submission.mjs --body "$RUNNER_TEMP/body.md" --dir "$RUNNER_TEMP/work" \
+          node scripts/check-submission.mjs --body "$RUNNER_TEMP/body.md" --dir "$RUNNER_TEMP/work" --author "$AUTHOR" \
             --comment "$RUNNER_TEMP/comment.md" --result "$RUNNER_TEMP/result.json"
 
       - name: Get it ready
@@ -73,6 +73,7 @@ jobs:
           --result "$RUNNER_TEMP/result.json"
           --approved-sha256 "${{ steps.approved.outputs.sha256 }}"
           --author "$AUTHOR"
+          --approver "$APPROVER"
           --list basemaps.json
           --notes "$RUNNER_TEMP/notes.md"
 

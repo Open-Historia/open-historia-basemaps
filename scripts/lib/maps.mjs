@@ -146,7 +146,10 @@ export const addVersion = (list, { id, version, tag, size, sha256, name, author,
   if (!map) {
     if (!name) throw new Error("A new map needs a name.");
     if (!license) throw new Error("A new map needs a licence.");
-    map = { id, name, ...(author ? { author } : {}), license, versions: [] };
+    // The submitter of the first version owns the map: only its owners may
+    // publish new versions (README, "Who owns a map"). More owners are added
+    // by editing basemaps.json.
+    map = { id, name, ...(author ? { author, owners: [author] } : {}), license, versions: [] };
     list.basemaps.push(map);
   }
   map.versions.push({
@@ -160,6 +163,11 @@ export const addVersion = (list, { id, version, tag, size, sha256, name, author,
   map.versions.sort((a, b) => a.version - b.version);
   return "added";
 };
+
+// A map's owners: its "owners" list, or, for an entry from before owners were
+// recorded, its author.
+export const mapOwners = (map) => (Array.isArray(map?.owners) && map.owners.length ? map.owners : map?.author ? [map.author] : [])
+  .map((login) => String(login));
 
 export const plain = (text) => String(text || "")
   .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
