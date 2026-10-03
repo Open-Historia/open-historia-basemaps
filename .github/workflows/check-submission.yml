@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   check:
-    if: startsWith(github.event.issue.title, '[Submit map]') && github.event.issue.state == 'open'
+    if: (startsWith(github.event.issue.title, '[Submit map]') || contains(github.event.issue.body, '### Download link to the .pmtiles file')) && github.event.issue.state == 'open'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

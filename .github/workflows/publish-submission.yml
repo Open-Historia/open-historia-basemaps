@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   publish:
-    if: github.event.label.name == 'approved' && startsWith(github.event.issue.title, '[Submit map]')
+    if: github.event.label.name == 'approved' && (startsWith(github.event.issue.title, '[Submit map]') || contains(github.event.issue.body, '### Download link to the .pmtiles file'))
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
