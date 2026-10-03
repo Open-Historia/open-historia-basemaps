@@ -5,15 +5,8 @@ The official detailed maps for Open Historia. The game downloads detailed (tiled
 - `basemaps.json` lists every map: a fixed **id**, and for each **version** its release link, size and SHA-256 checksum.
 - Each version's `.pmtiles` file (and an optional preview picture) is attached to its own release, tagged `<id>-v<version>`, for example `got-world-v1`.
 - The map files themselves live only in releases, never in the repository.
+- The maps available right now are listed at the bottom of this page, under [Maps](#maps).
 - Designers submit maps through an issue form, a bot checks them, and once a maintainer approves one it is published automatically.
-
-## Maps
-
-The maps players are offered right now. This table is rewritten automatically from [`basemaps.json`](basemaps.json) whenever a map is added, and each version has its own page under [Releases](https://github.com/Open-Historia/open-historia-basemaps/releases) with its description, credits and licence.
-
-<!-- maps:start -->
-_No maps yet._
-<!-- maps:end -->
 
 ## For scenario designers
 
@@ -102,3 +95,11 @@ Never change or delete the file of a version that is already listed: scenarios a
 This repository's own files (this README, `basemaps.json`, the check script and the action) are licensed under the GNU Affero General Public License v3.0 or later, the same as Open Historia; see [LICENSE](LICENSE).
 
 Each map has its own licence, which applies to that map's release files. It is named in `basemaps.json`, and given in full with the map's credits in the notes of its release. The Game of Thrones world map (`got-world`) is CC BY-NC-SA 3.0. It is drawn from GOT-Inspired-Map by cadaei, theMountainGoat and Tear, and A Song of Ice and Fire is © George R. R. Martin. It is an unofficial, non-commercial fan map.
+
+## Maps
+
+The maps players are offered right now. This table is rewritten automatically from [`basemaps.json`](basemaps.json) whenever a map is added, and each version has its own page under [Releases](https://github.com/Open-Historia/open-historia-basemaps/releases) with its description, credits and licence.
+
+<!-- maps:start -->
+_No maps yet._
+<!-- maps:end -->
