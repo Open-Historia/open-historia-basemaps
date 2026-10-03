@@ -9,7 +9,11 @@ The official detailed maps for Open Historia. The game downloads detailed (tiled
 
 ## Maps
 
-Every published map is in [`basemaps.json`](basemaps.json), and each version has its own page under [Releases](https://github.com/Open-Historia/open-historia-basemaps/releases), with its description, credits and licence. Both are updated automatically when a map is approved, so there is no list to keep up to date here.
+The maps players are offered right now. This table is rewritten automatically from [`basemaps.json`](basemaps.json) whenever a map is added, and each version has its own page under [Releases](https://github.com/Open-Historia/open-historia-basemaps/releases) with its description, credits and licence.
+
+<!-- maps:start -->
+_No maps yet._
+<!-- maps:end -->
 
 ## For scenario designers
 

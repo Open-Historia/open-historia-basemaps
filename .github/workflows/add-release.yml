@@ -71,7 +71,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add basemaps.json
+          node scripts/update-readme.mjs
+          git add basemaps.json README.md
           git commit -m "Add $TAG to the list"
           git push --force -u origin "$branch"
           if gh pr view "$branch" --json state --jq .state 2>/dev/null | grep -q OPEN; then
