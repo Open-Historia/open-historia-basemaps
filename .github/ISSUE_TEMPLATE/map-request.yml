@@ -97,7 +97,7 @@ body:
       options:
         - label: I made this map, or I have the right to share it under the licence above.
           required: true
-        - label: Any scenario using this map also includes a basic (painted) map, for players who don't download it.
+        - label: Any scenario using this map also has its own basemap, for players who don't download it.
           required: true
         - label: The file is 500 MB or less.
           required: true

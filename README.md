@@ -10,37 +10,37 @@ The official detailed maps for Open Historia. The game downloads detailed (tiled
 
 ## For scenario designers
 
-### Detailed maps and basic maps
+### Basemaps and detailed maps
 
-A scenario with its own map draws a **basic map** under its countries. This is a painted drawing of land, forests, mountains and rivers, carried inside the scenario file. It is small, but it's flat colour, so it looks plain when you zoom right in.
+> **Two different things:**
+> - A **basemap** is the flat map drawn under the countries: a built-in Earth map (Satellite, Ocean…), an uploaded picture, or a painted map. Every scenario has one, and a custom one travels inside the scenario.
+> - A **detailed map** is an optional extra layer drawn **on top of** a scenario's basemap: a large set of picture tiles (often hundreds of MB) that stays sharp from the whole world down to single castles and streets. It's far too big to go inside a scenario, so it lives here, and a scenario only names it: "this map, version 1 or newer".
 
-A **detailed map** is a large set of picture tiles (often hundreds of MB) that stays sharp from the whole world down to single castles and streets. It is far too big to go inside a scenario, so it lives here. A scenario only names it: "this map, version 1 or newer".
+Every scenario on a detailed map **must also have its own basemap**. Players who don't download the detailed map, or whose game can't show it, see the basemap instead. That includes the browser and Android versions and older versions of the game.
 
-Every scenario on a detailed map **must also have a basic map**. Players who don't download the detailed map, or whose game can't show it, see the basic map instead. That includes the browser and Android versions and older versions of the game.
+### Using a detailed map from this list
 
-### Using a map from this list
+1. In the Map Editor, press **Basemap: …** in the bottom bar to open the **Maps** window. First give your scenario a basemap of its own: under **My Maps → Your basemaps** pick one, or add one with **⬆ Add basemap or detailed map**, or draw one in the editor. The editor won't let you pick a detailed map until the scenario has a basemap.
+2. Open the **Community** tab, choose **Detailed maps**, and download the map you want. It then appears under **My Maps → Your detailed maps**.
+3. Click it there. Your scenario now names that detailed map (the bottom bar shows **Detailed map: …**), and the version you have is the lowest version it asks for.
+4. Save and publish your scenario as usual. It never carries the detailed map itself, only its name.
 
-1. In the Map Editor, open the basemap picker. First give your scenario a basic map: upload or draw a painted (vector) basemap, or use one you already have. The editor won't let you pick a detailed map until a basic map is in place.
-2. Open the **Detailed maps** tab and download the map you want. It then appears under **My Basemaps**.
-3. Click it under My Basemaps. Your scenario now names that map, and the version you have is the lowest version it asks for.
-4. Save and publish your scenario as usual. It never carries the map itself, only its name.
-
-What players see: when they install your scenario from the hub, the game offers the detailed map with its download size. They can download it, or play on the basic map and download it later from a banner over the map. A map downloads once, and every scenario on it shares it. Players can also choose the basic map any time in **Settings → Map → Scenario terrain**.
+What players see: when they install your scenario from the hub, the game offers the detailed map with its download size. They can download it, or play on the basemap and download it later, from a banner over the map or from **Settings → Map → Detailed maps**. A detailed map downloads once, and every scenario on it shares it. Players can turn detailed maps off any time in **Settings → Map → Detailed maps → Show detailed maps**.
 
 ### Making your own detailed map
 
 - It must be a **raster `.pmtiles` file** (picture tiles in PNG, JPEG, WebP or AVIF) of **500 MB or less**.
 - You can draw extra detail only around important places. Where a close-up tile is missing, the game enlarges the nearest less detailed one.
-- Try it first: in the basemap picker, **⬆ Add detailed map** loads your file into your own game, so you can build and test a scenario on it.
+- Try it first: in the Maps window, **⬆ Add basemap or detailed map** loads your `.pmtiles` file into your own game (it appears under **Your detailed maps**), so you can build and test a scenario on it.
 - **Licence and credits:** you must have the right to share everything in it. If it is drawn from someone else's map, data or artwork, credit them and follow their licence. For example, a map built on CC BY-NC-SA material must also be CC BY-NC-SA.
 
-Until your map is on this list, only you can see it. Anyone else playing your scenario gets its basic map.
+Until your detailed map is on this list, only you can see it. Anyone else playing your scenario gets its basemap.
 
 ### Submitting a map
 
 1. Put the `.pmtiles` file online as a **direct download**. A release on your own GitHub repository works best. Dropbox or any direct web link also works, but Google Drive often doesn't for big files. You can delete your copy once your map is published.
 2. Open the form. Either:
-   - in the game's basemap picker, press **⤴** on your map under My Basemaps. This opens the form with the map's name, size and checksum already filled in; or
+   - in the game's Maps window, press **⤴** on your map under **My Maps → Your detailed maps**. This opens the form with the map's name, size and checksum already filled in; or
    - go to this repository's **Issues → New issue** and choose **Submit a map or a map update**.
 3. Fill in the rest: the download link, the map ID you'd like (lower-case letters, digits and dashes, like `got-world`; it can never change later), what the map shows, screenshots (one zoomed out, one close up), who made it and what it is based on, and its licence. Tick the boxes and submit.
 
@@ -88,7 +88,7 @@ Both are buttons in the **Actions** tab: open the action, press **Run workflow**
 **Archive or restore a map** is for taking a map down for now.
 - Give the map ID, and a version number to archive only that version (leave it empty for the whole map), plus a reason.
 - An archived map is no longer offered for download in the game. Its release becomes a private draft: the file is kept, but nobody can download it.
-- Players who already have it keep using it. Players who don't have it play on the scenario's basic map, and are told the detailed map is no longer available.
+- Players who already have it keep using it. Players who don't have it play on the scenario's basemap, and are told the detailed map is no longer available.
 - Archiving one version (say a broken v2) makes the game offer the newest version that isn't archived instead.
 - **Restore** puts it all back: the release is published again under the same tag and link, and the game offers it again.
 - New versions can't be submitted for an archived map until it's restored.
