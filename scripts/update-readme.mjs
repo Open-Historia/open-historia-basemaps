@@ -21,14 +21,18 @@ const END = "<!-- maps:end -->";
 const cell = (text) => String(text ?? "").replace(/\|/g, "\\|").replace(/\s+/g, " ").trim();
 
 export const mapsTable = (list) => {
-  if (!list.basemaps.length) return "_No maps yet._";
-  const rows = list.basemaps.map((map) => {
-    const latest = map.versions[map.versions.length - 1];
+  // Deleted maps drop out of the table; archived ones stay, marked.
+  const shown = list.basemaps.filter((map) => !map.deleted);
+  if (!shown.length) return "_No maps yet._";
+  const rows = shown.map((map) => {
+    const live = map.versions.filter((entry) => !entry.deleted && !entry.archived);
+    const latest = live[live.length - 1] || map.versions.filter((entry) => !entry.deleted).pop();
     const tag = `${map.id}-v${latest.version}`;
     const owners = mapOwners(map).map((login) => `@${login}`).join(", ") || "—";
-    return `| \`${cell(map.id)}\` | ${cell(map.name)} | [v${latest.version}](https://github.com/${REPO}/releases/tag/${tag}) | ${megabytes(latest.bytes)} MB | ${cell(owners)} | ${cell(map.license) || "—"} |`;
+    const status = map.archived || !live.length ? "Archived" : "Available";
+    return `| \`${cell(map.id)}\` | ${cell(map.name)} | ${status} | [v${latest.version}](https://github.com/${REPO}/releases/tag/${tag}) | ${megabytes(latest.bytes)} MB | ${cell(owners)} | ${cell(map.license) || "—"} |`;
   });
-  return ["| ID | Name | Latest | Size | Owners | Licence |", "|---|---|---|---|---|---|", ...rows].join("\n");
+  return ["| ID | Name | Status | Latest | Size | Owners | Licence |", "|---|---|---|---|---|---|---|", ...rows].join("\n");
 };
 
 const readme = fs.readFileSync(readmePath, "utf8");

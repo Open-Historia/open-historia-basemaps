@@ -1,0 +1,60 @@
+# Safety net: when someone deletes a map's release by hand on the Releases
+# page, mark that version deleted in basemaps.json, so the game stops offering
+# a download that no longer exists. (Releases the actions change don't start
+# this; they update the list themselves.)
+name: Mark a deleted release in the list
+
+on:
+  release:
+    types: [deleted]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: basemaps-list
+  cancel-in-progress: false
+
+jobs:
+  mark:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TAG: ${{ github.event.release.tag_name }}
+      ACTOR: ${{ github.actor }}
+    steps:
+      - name: Is it a map release?
+        id: tag
+        run: |
+          if [[ "$TAG" =~ ^([a-z0-9][a-z0-9-]{0,63})-v([1-9][0-9]{0,5})$ ]]; then
+            echo "id=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+            echo "version=${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "$TAG isn't a map release; nothing to do."
+          fi
+
+      - uses: actions/checkout@v5
+        if: steps.tag.outputs.id
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v5
+        if: steps.tag.outputs.id
+        with:
+          node-version: 22
+
+      - if: steps.tag.outputs.id
+        run: npm ci
+
+      - name: Mark it deleted
+        if: steps.tag.outputs.id
+        env:
+          MAP_ID: ${{ steps.tag.outputs.id }}
+          MAP_VERSION: ${{ steps.tag.outputs.version }}
+        run: |
+          if node scripts/manage-map.mjs delete --id "$MAP_ID" --version "$MAP_VERSION" --reason "Release deleted by hand by @$ACTOR"; then
+            bash scripts/finish-change.sh "Mark $TAG deleted (its release was deleted by hand)" "🗑️ The release $TAG was deleted by @$ACTOR, so it was removed from the list. Players who already have it keep their copy." "$TAG"
+          else
+            echo "$TAG isn't in the list (or is already deleted); nothing to change."
+          fi

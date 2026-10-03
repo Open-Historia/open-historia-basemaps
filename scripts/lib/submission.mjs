@@ -69,6 +69,8 @@ export const planSubmission = (form, list, author = "") => {
     id = asked;
     if (!id) problems.push("An update needs the map ID of the map it updates.");
     else if (!list.basemaps.some((entry) => entry.id === id)) problems.push(`There is no map "${id}" on the list to update. Check the ID, or submit it as a new map.`);
+    else if (list.basemaps.find((entry) => entry.id === id).deleted) problems.push(`"${id}" was deleted, so it can't be updated. Submit yours as a new map with its own ID.`);
+    else if (list.basemaps.find((entry) => entry.id === id).archived) problems.push(`"${id}" is archived. Ask a maintainer to restore it before submitting an update.`);
     else {
       const owners = mapOwners(list.basemaps.find((entry) => entry.id === id));
       if (!owners.some((login) => login.toLowerCase() === String(author).toLowerCase())) {
@@ -79,6 +81,8 @@ export const planSubmission = (form, list, author = "") => {
   } else {
     id = asked || slugify(form.name);
     if (!ID_PATTERN.test(id)) problems.push(`"${id || form.name}" can't be a map ID: use lower-case letters, digits and dashes.`);
+    else if (list.basemaps.some((entry) => entry.id === id && entry.deleted)) problems.push(`"${id}" was used by a map that has been removed, so choose a different ID. Map IDs are never reused.`);
+    else if (list.basemaps.some((entry) => entry.id === id && entry.archived)) problems.push(`"${id}" belongs to a map that is archived, so choose a different ID (or ask a maintainer to restore that map, if it is yours).`);
     else if (list.basemaps.some((entry) => entry.id === id)) problems.push(`A map called "${id}" is already on the list. If this updates it, choose "Update to a map already on the list"; otherwise suggest a different map ID.`);
   }
   if (!form.kind) problems.push("Say whether this is a new map or an update.");

@@ -81,6 +81,31 @@ Only people with write, maintain or admin access can approve. The label from any
 
 You can still make a release yourself: tag `<map-id>-v<version>`, the map's name as the title, the file attached as `<tag>.pmtiles`, and a `## Licence` heading in the notes. The **Add a released map to the list** action checks it and opens a pull request adding it to `basemaps.json`, which you then merge. A release that is already on the list (like every approved submission) is skipped. To retry, open Actions → Add a released map to the list → Run workflow, and give it the tag.
 
+### Archiving, restoring and deleting maps
+
+Both are buttons in the **Actions** tab: open the action, press **Run workflow**, fill it in. Only maintainers can run them.
+
+**Archive or restore a map** is for taking a map down for now.
+- Give the map ID, and a version number to archive only that version (leave it empty for the whole map), plus a reason.
+- An archived map is no longer offered for download in the game. Its release becomes a private draft: the file is kept, but nobody can download it.
+- Players who already have it keep using it. Players who don't have it play on the scenario's basic map, and are told the detailed map is no longer available.
+- Archiving one version (say a broken v2) makes the game offer the newest version that isn't archived instead.
+- **Restore** puts it all back: the release is published again under the same tag and link, and the game offers it again.
+- New versions can't be submitted for an archived map until it's restored.
+
+**Delete a map permanently** is for takedowns. **It can't be undone.**
+- Give the map ID (and a version number for one version only), a reason, and type the map ID again to confirm (or `<id>-v<version>` for one version). Anything else stops it before it deletes anything.
+- It deletes the release, its file and its tag.
+- In `basemaps.json` it leaves a small marker (the date and reason, with no link), so:
+  - **a deleted map's ID is never used again**, by anyone; a submission using it is refused;
+  - **version numbers are never reused**: if v2 was deleted, the next upload is v3;
+  - the game can tell players the map was removed.
+- Players who already have it keep their copy. A player whose copy is an archived or deleted version is offered the newest available version as a normal update, which then replaces their copy. A scenario that asks for a version that was deleted accepts any newer version that is still available.
+
+The archive and delete actions comment on the map's original submission issue, and update the map table below. Deleted maps drop out of the table; archived ones show as Archived.
+
+If someone deletes a map's release by hand on the Releases page, the **Mark a deleted release in the list** action notices and marks that version deleted in the list, so the game stops offering a download that no longer exists.
+
 ### Repository settings (for an admin, once)
 
 - **Settings → Actions → General → Workflow permissions:** each action asks only for the permissions it needs. Nothing has to change unless the organisation limits the token. If a run fails with "Resource not accessible by integration", choose **Read and write permissions** here.
@@ -101,7 +126,7 @@ Each map has its own licence, which applies to that map's release files. It is n
 The maps players are offered right now. This table is rewritten automatically from [`basemaps.json`](basemaps.json) whenever a map is added, and each version has its own page under [Releases](https://github.com/Open-Historia/open-historia-basemaps/releases) with its description, credits and licence.
 
 <!-- maps:start -->
-| ID | Name | Latest | Size | Owners | Licence |
-|---|---|---|---|---|---|
-| `got-world` | Game of Thrones world map | [v1](https://github.com/Open-Historia/open-historia-basemaps/releases/tag/got-world-v1) | 442 MB | @SeventhDread | CC BY-NC-SA 3.0 |
+| ID | Name | Status | Latest | Size | Owners | Licence |
+|---|---|---|---|---|---|---|
+| `got-world` | Game of Thrones world map | Available | [v1](https://github.com/Open-Historia/open-historia-basemaps/releases/tag/got-world-v1) | 442 MB | @SeventhDread | CC BY-NC-SA 3.0 |
 <!-- maps:end -->

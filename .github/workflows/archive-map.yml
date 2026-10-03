@@ -1,0 +1,85 @@
+# Archives a map (or one version of it), or restores it. Archived: the game
+# stops offering it for download, and its release becomes a private draft (the
+# file is kept, not deleted); players who already have it keep using it.
+# Restoring publishes the release again under the same tag and link.
+name: Archive or restore a map
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Archive or restore"
+        type: choice
+        options: [archive, restore]
+        required: true
+      id:
+        description: "Map ID, like got-world"
+        required: true
+      version:
+        description: "One version only (a number), or leave empty for the whole map"
+        required: false
+      reason:
+        description: "Why (required to archive; shown in the list and on the submission issue)"
+        required: false
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: basemaps-list
+  cancel-in-progress: false
+
+jobs:
+  change:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ACTION: ${{ inputs.action }}
+      MAP_ID: ${{ inputs.id }}
+      MAP_VERSION: ${{ inputs.version }}
+      REASON: ${{ inputs.reason }}
+      ACTOR: ${{ github.actor }}
+    steps:
+      - name: Only maintainers
+        run: |
+          permission=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission 2>/dev/null || echo none)
+          case "$permission" in admin|maintain|write) ;; *) echo "::error::Only maintainers can archive or restore maps."; exit 1 ;; esac
+
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - name: Change the list
+        id: list
+        run: node scripts/manage-map.mjs "$ACTION" --id "$MAP_ID" --version "$MAP_VERSION" --reason "$REASON"
+
+      - name: Change the releases
+        env:
+          TAGS: ${{ steps.list.outputs.tags }}
+        run: |
+          for tag in $TAGS; do
+            if [ "$ACTION" = "archive" ]; then
+              gh release edit "$tag" --draft=true
+            else
+              gh release edit "$tag" --draft=false
+            fi
+          done
+
+      - name: Commit, and tell the submitter
+        env:
+          TAGS: ${{ steps.list.outputs.tags }}
+        run: |
+          what="$MAP_ID${MAP_VERSION:+ version $MAP_VERSION}"
+          if [ "$ACTION" = "archive" ]; then
+            comment="📦 **Archived** by @$ACTOR: $what is no longer offered for download. Players who already have it keep using it. Reason: ${REASON}"
+          else
+            comment="♻️ **Restored** by @$ACTOR: $what is offered for download again."
+          fi
+          bash scripts/finish-change.sh "${ACTION^} $what" "$comment" $TAGS

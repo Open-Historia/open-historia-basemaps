@@ -138,6 +138,8 @@ export const nextVersion = (list, id) => {
 export const addVersion = (list, { id, version, tag, size, sha256, name, author, license, preview }) => {
   const url = `${RELEASES}${tag}/${tag}.pmtiles`;
   let map = list.basemaps.find((entry) => entry.id === id);
+  if (map?.deleted) throw new Error(`${id} was deleted on ${map.deleted.date}, so its ID can't be used again. Choose another ID.`);
+  if (map?.archived) throw new Error(`${id} is archived. A maintainer must restore it before it gets new versions.`);
   const listed = map?.versions?.find((entry) => entry.version === version);
   if (listed) {
     if (listed.sha256 === sha256 && listed.bytes === size && listed.url.toLowerCase() === url.toLowerCase()) return "listed";
