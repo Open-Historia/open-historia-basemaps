@@ -10,7 +10,7 @@ The official detailed maps for Open Historia. The game downloads detailed (tiled
 
 | Id | Name | Licence |
 |---|---|---|
-| `got-world` | Game of Thrones world map | CC BY-NC-SA 3.0, in the [got-world-v1 release notes](https://github.com/Open-Historia/open-historia-basemaps/releases/tag/got-world-v1) |
+| `got-world` | Game of Thrones world map (added by the action once its release is published and the pull request merged) | CC BY-NC-SA 3.0, in the [got-world-v1 release notes](https://github.com/Open-Historia/open-historia-basemaps/releases/tag/got-world-v1) |
 
 ## How players get a map
 
