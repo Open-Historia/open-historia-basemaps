@@ -128,5 +128,5 @@ The maps players are offered right now. This table is rewritten automatically fr
 <!-- maps:start -->
 | ID | Name | Status | Latest | Size | Owners | Licence |
 |---|---|---|---|---|---|---|
-| `got-world` | Game of Thrones world map | Archived | [v1](https://github.com/Open-Historia/open-historia-basemaps/releases/tag/got-world-v1) | 442 MB | @SeventhDread | CC BY-NC-SA 3.0 |
+| `got-world` | Game of Thrones world map | Available | [v1](https://github.com/Open-Historia/open-historia-basemaps/releases/tag/got-world-v1) | 442 MB | @SeventhDread | CC BY-NC-SA 3.0 |
 <!-- maps:end -->
